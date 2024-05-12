@@ -74,8 +74,60 @@ const getIncomes = async (req, res) => {
   }
 };
 
+// Funkcja usuwania przychodu
+const deleteIncome = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: 'Invalid ID' });
+    }
+
+    const deletedIncome = await Income.findByIdAndDelete(id);
+
+    if (!deletedIncome) {
+      return res.status(404).json({ message: 'Income not found' });
+    }
+
+    // Symulacja aktualizacji salda
+    const newBalance = 0;
+
+    res.status(200).json({ newBalance });
+  } catch (error) {
+    // Obsługa błędów
+    console.error('Error deleting income:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+// Funkcja aktualizacji przychodu
+const updateIncome = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: 'Invalid ID' });
+    }
+
+    const { description, amount, date } = req.body;
+
+    const updatedIncome = await Income.findByIdAndUpdate(id, { description, amount, date }, { new: true });
+
+    if (!updatedIncome) {
+      return res.status(404).json({ message: 'Income not found' });
+    }
+
+    res.status(200).json(updatedIncome);
+  } catch (error) {
+    // Obsługa błędów
+    console.error('Error updating income:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 
 module.exports = {
   addIncome,
-  getIncomes
+  getIncomes,
+  deleteIncome,
+  updateIncome
 };

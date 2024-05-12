@@ -20,6 +20,10 @@ const incomeSchema = new mongoose.Schema({
   month: {
     type: String,
     required: true
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
 });
 

@@ -5,14 +5,18 @@ const checkAuth = (req, res, next) => {
   const token = req.headers.authorization;
 
   if (!token) {
-    // Jeśli brak tokenu - zwróć błąd "Unauthorized"
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  // Miejsce na przeprowadzenie dalszej weryfikacji tokenu
+  // Sprawdź poprawność tokenu JWT
+  jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+    if (err) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
 
-  // Jeśli autoryzacja jest pomyślna, przechodzimy do kolejnego middleware.... 
-  next();
+    // Jeśli autoryzacja jest pomyślna, przechodzimy do kolejnego middleware
+    next();
+  });
 };
 
 module.exports = {
