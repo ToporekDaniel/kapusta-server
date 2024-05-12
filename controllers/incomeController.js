@@ -2,9 +2,9 @@ const Income = require('../models/Income');
 const Joi = require('@hapi/joi');
 
 // Walidacja dla danych wejściowych
-const schema = Joi.object({
-  description: Joi.string().required(),
-  amount: Joi.number().required(),
+const incomeSchema = Joi.object({
+  description: Joi.string().min(1).max(300).required(),
+  amount: Joi.number().min(1).max(1000000000).required(),
   date: Joi.date().iso().required()
 });
 
@@ -12,7 +12,7 @@ const schema = Joi.object({
 const addIncome = async (req, res) => {
   try {
     // Walidacja danych wejściowych
-    const { error } = schema.validate(req.body);
+    const { error } = incomeSchema.validate(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
@@ -27,11 +27,12 @@ const addIncome = async (req, res) => {
     ];
     const monthName = monthNames[incomeMonth];
 
+    // Tworzenie nowego przychodu z dodanym miesiącem
     const newIncome = new Income({
       description,
       amount,
       date,
-      month: monthName 
+      month: monthName
     });
 
     await newIncome.save();
