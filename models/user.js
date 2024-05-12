@@ -29,9 +29,6 @@ const userSchema = new Schema({
           date: String,
         },
     ],
-    verificationToken: {
-        type: String,
-      },
 });
 
 userSchema.pre('save', async function (next) {
