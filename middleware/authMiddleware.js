@@ -11,7 +11,7 @@ const checkAuth = (req, res, next) => {
 
   // Miejsce na przeprowadzenie dalszej weryfikacji tokenu
 
-  // Jeśli autoryzacja jest pomyślna, przechodzimy do kolejnego middleware 
+  // Jeśli autoryzacja jest pomyślna, przechodzimy do kolejnego middleware.... 
   next();
 };
 
