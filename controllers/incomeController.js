@@ -3,18 +3,30 @@ const Income = require('../models/Income');
 // Funkcja dodawania przychodów
 const addIncome = async (req, res) => {
   try {
-    const { description, amount, date } = req.body;
+    const { description, amount, date, month } = req.body; 
+
+    
+    const incomeMonth = new Date(date).getMonth();
+
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const monthName = monthNames[incomeMonth];
 
     const newIncome = new Income({
       description,
       amount,
-      date
+      date,
+      month: monthName 
     });
 
     await newIncome.save();
 
+    const newBalance = 100; // logika obliczania nowego salda
+
     res.status(200).json({
-      newBalance: 100, // newBalance spiąć z wartością (teraz jest sztywna wartość)
+      newBalance: newBalance,
       transaction: newIncome
     });
   } catch (error) {
@@ -23,9 +35,7 @@ const addIncome = async (req, res) => {
   }
 };
 
-module.exports = {
-  addIncome
-};
+
 
 // Funkcja pobierania przychodów
 const getIncomes = async (req, res) => {
@@ -56,6 +66,9 @@ const getIncomes = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
+  addIncome,
   getIncomes
 };
