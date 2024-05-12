@@ -1,11 +1,24 @@
 const Income = require('../models/Income');
+const Joi = require('@hapi/joi');
+
+// Walidacja dla danych wejściowych
+const schema = Joi.object({
+  description: Joi.string().required(),
+  amount: Joi.number().required(),
+  date: Joi.date().iso().required()
+});
 
 // Funkcja dodawania przychodów
 const addIncome = async (req, res) => {
   try {
-    const { description, amount, date, month } = req.body; 
+    // Walidacja danych wejściowych
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
-    
+    const { description, amount, date } = req.body;
+
     const incomeMonth = new Date(date).getMonth();
 
     const monthNames = [
@@ -31,7 +44,7 @@ const addIncome = async (req, res) => {
     });
   } catch (error) {
     console.error('Error adding income:', error);
-    res.status(400).json({ message: 'Bad request' });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
