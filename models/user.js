@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const userSchema = new Schema({
     email: {
         type: String,
-        required: true,
+        required: [true, 'E-mail is required'],
         unique: true,
         match: /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/
     },
