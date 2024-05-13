@@ -101,33 +101,32 @@ const deleteIncome = async (req, res) => {
 };
 
 // Funkcja aktualizacji przychodu
-const updateIncome = async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!id) {
-      return res.status(400).json({ message: 'Invalid ID' });
-    }
+// const updateIncome = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     if (!id) {
+//       return res.status(400).json({ message: 'Invalid ID' });
+//     }
 
-    const { description, amount, date } = req.body;
+//     const { description, amount, date } = req.body;
 
-    const updatedIncome = await Income.findByIdAndUpdate(id, { description, amount, date }, { new: true });
+//     const updatedIncome = await Income.findByIdAndUpdate(id, { description, amount, date }, { new: true });
 
-    if (!updatedIncome) {
-      return res.status(404).json({ message: 'Income not found' });
-    }
+//     if (!updatedIncome) {
+//       return res.status(404).json({ message: 'Income not found' });
+//     }
 
-    res.status(200).json(updatedIncome);
-  } catch (error) {
-    // Obsługa błędów
-    console.error('Error updating income:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
+//     res.status(200).json(updatedIncome);
+//   } catch (error) {
+//     console.error('Error updating income:', error);
+//     res.status(500).json({ message: 'Internal Server Error' });
+//   }
+// };
 
 
 module.exports = {
   addIncome,
   getIncomes,
   deleteIncome,
-  updateIncome
+//   updateIncome
 };
