@@ -31,9 +31,11 @@ const auth = async (req, res, next) => {
 
 const register = async (req, res, next) => {
     try {
-      const { body } = req;
-      const { email, password } = body;
-  
+      const { email, password } = req.body;
+      const existingUser = await User.findOne({ email });
+    if (existingUser) {
+    return res.status(409).json({status: 'fail', message: "Email already in use"})
+  }
     const user = await User.create({
         email,
         password,
