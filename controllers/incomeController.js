@@ -1,5 +1,6 @@
 const Income = require('../models/Income');
 const incomeSchema = require('../models/incomeJoi');
+const { checkAuth } = require('../middleware/authMiddleware');
 
 
 // Funkcja dodawania przychodów
@@ -19,10 +20,13 @@ const addIncome = async (req, res) => {
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
-    const monthName = monthNames[incomeMonth];
+      const monthName = monthNames[incomeMonth];
+      
+      const userId = req.user._id;
 
     // Tworzenie nowego przychodu z dodanym miesiącem
-    const newIncome = new Income({
+      const newIncome = new Income({
+      userId: userId,
       description,
       amount,
       date,
@@ -46,7 +50,9 @@ const addIncome = async (req, res) => {
 // Funkcja pobierania przychodów
 const getIncomes = async (req, res) => {
   try {
-    const incomes = await Income.find();
+    const userId = req.user._id;
+
+    const incomes = await Income.find({ userId: userId });
 
     const monthStats = {
       "January": 5,
@@ -83,7 +89,9 @@ const deleteIncome = async (req, res) => {
       return res.status(400).json({ message: 'Invalid ID' });
     }
 
-    const deletedIncome = await Income.findByIdAndDelete(id);
+    const userId = req.user._id;
+
+    const deletedIncome = await Income.findOneAndDelete({ _id: id, userId: userId });
 
     if (!deletedIncome) {
       return res.status(404).json({ message: 'Income not found' });
@@ -108,9 +116,9 @@ const deleteIncome = async (req, res) => {
 //       return res.status(400).json({ message: 'Invalid ID' });
 //     }
 
-//     const { description, amount, date } = req.body;
+//     const userId = req.user._id;
 
-//     const updatedIncome = await Income.findByIdAndUpdate(id, { description, amount, date }, { new: true });
+//     const updatedIncome = await Income.findOneAndUpdate({ _id: id, userId: userId }, { ...req.body }, { new: true });
 
 //     if (!updatedIncome) {
 //       return res.status(404).json({ message: 'Income not found' });
@@ -128,5 +136,6 @@ module.exports = {
   addIncome,
   getIncomes,
   deleteIncome,
-//   updateIncome
+    //   updateIncome
+  checkAuth
 };
