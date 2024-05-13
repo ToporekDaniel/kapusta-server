@@ -75,6 +75,8 @@ const register = async (req, res, next) => {
             username: email,
         });
         const refreshToken = generateRefreshToken(user.id);
+
+        res.cookie("refreshToken", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
   
       res.status(200).json({
         status: 'success',
@@ -90,10 +92,11 @@ const register = async (req, res, next) => {
   const logout = async (req, res, next) => {
     try {
       const user = req.user;
-
+      
       if (!user) {
           return res.status(401).json({ message: `Not authorized` });
       }
+      res.clearCookie("refreshToken");
       return res.status(204).json();
   } catch (error) {
       console.error("Error during logout: ", error);
@@ -101,44 +104,50 @@ const register = async (req, res, next) => {
   }
   };
 
-//   const refresh = async (req, res, next) => {
-//     const { refreshToken}  = req.body;
+  const refresh = async (req, res, next) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
 
-//     if (!refreshToken) {
-//         return res.status(401).json({ message: 'Refresh token is required' });
-//     }
+        if (!refreshToken) {
+            return res.status(401).json({ message: "Refresh token not provided" });
+        }
 
-//     const splitToken = refreshToken.split(' ')[1];
-//     console.log(splitToken);
+        const splitToken = refreshToken.split(" ")[1];
 
-//     jwt.verify(splitToken, process.env.JWT_REFRESH_SECRET, async (err, decodedToken) => {
-//         if (err) {
-//             return res.status(403).json({ message: 'Invalid refresh token' });
-//         }
+        jwt.verify(splitToken, process.env.JWT_REFRESH_SECRET, async (err, decodedToken) => {
+            if (err) {
+                return res.status(403).json({ message: "Invalid refresh token" });
+            }
 
-//         const user = await User.findOne({ _id: decodedToken.id});
+            const user = await User.findOne({ _id: decodedToken.id });
 
-//         if (!user) {
-//             return res.status(401).json({ message: 'No such user' });
-//         }
+            if (!user) {
+                return res.status(401).json({ message: "No such user" });
+            }
 
-//         const payload = {
-//             id: user._id,
-//             username: user.username,
-//         };
+            const payload = {
+                id: user._id,
+                username: user.email,
+            };
 
-//         const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME });
-//         const newRefreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRE_TIME });
+            const newAccessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
+                expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME,
+            });
 
-//         return res.json({ accessToken, refreshToken: newRefreshToken });
-//     });
-// }
-
+            res.status(200).json({ accessToken: newAccessToken });
+        });
+    } catch (err) {
+        console.error("Error during token refresh: ", err);
+        res.status(500).json({ error: true, message: "Internal Server Error" });
+next()
+  }
+};
+// 
 
   module.exports = {
     register,
     login,
     logout,
     auth,
-    // refresh,
+    refresh,
   };
