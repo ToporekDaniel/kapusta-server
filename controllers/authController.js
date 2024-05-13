@@ -92,7 +92,6 @@ const register = async (req, res, next) => {
       if (!user) {
           return res.status(401).json({ message: `Not authorized` });
       }
-      await user.save();
       return res.status(204).json();
   } catch (error) {
       console.error("Error during logout: ", error);
@@ -100,37 +99,38 @@ const register = async (req, res, next) => {
   }
   };
 
-  const refresh = async (req, res, next) => {
-    const refreshToken = req.headers.authorization;
+//   const refresh = async (req, res, next) => {
+//     const { refreshToken}  = req.body;
 
-    if (!refreshToken) {
-        return res.status(401).json({ message: 'Refresh token is required' });
-    }
+//     if (!refreshToken) {
+//         return res.status(401).json({ message: 'Refresh token is required' });
+//     }
 
-    const splitToken = refreshToken.split(' ')[1];
+//     const splitToken = refreshToken.split(' ')[1];
+//     console.log(splitToken);
 
-    jwt.verify(splitToken, process.env.JWT_REFRESH_SECRET, async (err, decodedToken) => {
-        if (err) {
-            return res.status(403).json({ message: 'Invalid refresh token' });
-        }
+//     jwt.verify(splitToken, process.env.JWT_REFRESH_SECRET, async (err, decodedToken) => {
+//         if (err) {
+//             return res.status(403).json({ message: 'Invalid refresh token' });
+//         }
 
-        const user = await User.findOne({ _id: decodedToken.id});
+//         const user = await User.findOne({ _id: decodedToken.id});
 
-        if (!user) {
-            return res.status(401).json({ message: 'No such user' });
-        }
+//         if (!user) {
+//             return res.status(401).json({ message: 'No such user' });
+//         }
 
-        const payload = {
-            id: user._id,
-            username: user.username,
-        };
+//         const payload = {
+//             id: user._id,
+//             username: user.username,
+//         };
 
-        const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME });
-        const newRefreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRE_TIME });
+//         const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME });
+//         const newRefreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRE_TIME });
 
-        return res.json({ accessToken, refreshToken: newRefreshToken });
-    });
-}
+//         return res.json({ accessToken, refreshToken: newRefreshToken });
+//     });
+// }
 
 
   module.exports = {
@@ -138,5 +138,5 @@ const register = async (req, res, next) => {
     login,
     logout,
     auth,
-    refresh,
+    // refresh,
   };
