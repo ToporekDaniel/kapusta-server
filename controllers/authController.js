@@ -134,6 +134,10 @@ const register = async (req, res, next) => {
 //     });
 // }
 
+const google = async (req, res, next) => {
+  const profile = req.body;
+  console.log('auth google-profile: profile');
+}
 
   module.exports = {
     register,
