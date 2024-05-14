@@ -3,13 +3,15 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-router.post('/register', authController.register);
-
-router.post('/login', authController.login);
-
-router.post('/logout', authController.auth, authController.logout);
 
 router.post('/google', authController.google);
+
+router.post('/register', authController.register);
+//
+router.post('/login', authController.login);
+//
+router.post('/logout', authController.auth, authController.logout);
+
 
 // router.post('/refresh', authController.auth, authController.refresh);
 

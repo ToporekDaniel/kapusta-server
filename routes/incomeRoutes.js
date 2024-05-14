@@ -13,6 +13,6 @@ router.get('/income', incomeController.getIncomes);
 router.delete('/income/:id', incomeController.deleteIncome); // authMiddleware.checkAuth dodać jak będzie gotowu user
 
 // Endpoint do aktualizacji przychodu
-router.put('/income/:id', incomeController.updateIncome); // authMiddleware.checkAuth dodać jak będzie gotowu user
+// router.put('/income/:id', incomeController.updateIncome); // authMiddleware.checkAuth dodać jak będzie gotowu user
 
 module.exports = router;
