@@ -1,5 +1,4 @@
 const { v4: uuidv4 } = require("uuid");
-const passport = require("../config/passport.js");
 
 const User = require("../models/user.js");
 const jwt = require("jsonwebtoken");
@@ -44,24 +43,20 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password)
-      return res
-        .status(400)
-        .json({
-          status: "fail",
-          message: "Please provide an email or password",
-        });
+      return res.status(400).json({
+        status: "fail",
+        message: "Please provide an email or password",
+      });
 
     const user = await User.findOne({
       email,
     }).select("password email verify name");
 
     if (!user || !(await user.isCorrectPassword(password, user.password)))
-      return res
-        .status(400)
-        .json({
-          status: "fail",
-          message: "The email or password is incorrect!",
-        });
+      return res.status(400).json({
+        status: "fail",
+        message: "The email or password is incorrect!",
+      });
 
     const accessToken = signToken({
       id: user.id,

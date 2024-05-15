@@ -1,8 +1,11 @@
 const express = require("express");
-const transactionsRouter = require("./routes/incomeRoutes");
 const cors = require("cors");
+const passport = require("./config/passport");
+
+const transactionsRouter = require("./routes/incomeRoutes");
 const authRouter = require("./routes/authRouter");
 const authMid = require("./middleware/authMiddleware");
+const usersRouter = require("./routes/usersRouter");
 
 const app = express();
 
@@ -12,10 +15,11 @@ app.use(cors());
 
 app.use(express.json());
 app.use(express.static("public"));
+app.use(passport.initialize());
 
 app.use("/api/auth", authRouter);
 app.use("/api/transactions", authMid, transactionsRouter);
-// app.use("/api/user", authMid, usersRouter);
+app.use("/api/user", authMid, usersRouter);
 // dodatkowo przed routerem można dodać middleware autoryzujący użytkownika
 
 app.use((req, res) => {
