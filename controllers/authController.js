@@ -146,33 +146,8 @@ const logout = async (req, res, next) => {
 // }
 
 const google = async (req, res, next) => {
-  // const profile = req.body;
-  // console.log("auth google-profile: profile");
-  // try {
-  //   const { email, password } = req.body;
-  //   const existingUser = await User.findOne({ email });
-  //   if (existingUser) {
-  //     return res.status(409).json({
-  //       status: "fail",
-  //       message: "Email already in use",
-  //     });
-  //   }
-  //   const user = await User.create({
-  //     email,
-  //     password,
-  //     verificationToken: uuidv4(),
-  //   });
-  //
-  //   res.status(201).json({
-  //     status: "success",
-  //     message: "Account created.",
-  //   });
-  // } catch (err) {
-  //   res.status(400).json({ status: "fail", message: err.message });
-  // }
-
   try {
-    require("dotenv").config();
+    // require("dotenv").config();
     const { tokens } = await App.oAuth2Client.getToken(req.body.code); // exchange code for tokens
     console.log(tokens);
 

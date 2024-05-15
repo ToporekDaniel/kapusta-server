@@ -2,6 +2,7 @@ const express = require("express");
 const transactionsRouter = require("./routes/incomeRoutes");
 const cors = require("cors");
 const authRouter = require("./routes/authRouter");
+const usersRouter = require("./routes/users");
 
 const {
   OAuth2Client,
@@ -22,20 +23,12 @@ const oAuth2Client = new OAuth2Client(
   "postmessage",
 );
 
+
+
 app.use("/api/auth", authRouter);
-// app.use("/api/users", usersRouter);
+app.use("/api/user", usersRouter);
 app.use("/api/transactions", transactionsRouter);
 // dodatkowo przed routerem można dodać middleware autoryzujący użytkownika
-
-
-// app.post('/api/auth/google', async (req, res) => {
-//   // const qs = querystring.parse(url.parse(req.url).query);
-//   const { tokens } = await oAuth2Client.getToken(req.body.code); // exchange code for tokens
-//   console.log(tokens);
-//   
-//   res.json(tokens);
-// });
-
 
 
 app.use((req, res) => {
