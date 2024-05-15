@@ -1,8 +1,8 @@
 const express = require("express");
-const transactionsRouter = require("./routes/incomeRoutes")
+const transactionsRouter = require("./routes/incomeRoutes");
 const cors = require("cors");
-const authRouter = require('./routes/authRouter');
-
+const authRouter = require("./routes/authRouter");
+const authMid = require("./middleware/authMiddleware");
 
 const app = express();
 
@@ -14,8 +14,8 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.use("/api/auth", authRouter);
-// app.use("/api/users", usersRouter);
-app.use("/api/transactions", transactionsRouter);
+app.use("/api/transactions", authMid, transactionsRouter);
+// app.use("/api/user", authMid, usersRouter);
 // dodatkowo przed routerem można dodać middleware autoryzujący użytkownika
 
 app.use((req, res) => {

@@ -1,18 +1,19 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const incomeController = require('../controllers/incomeController');
-// const authMiddleware = require('../middleware/authMiddleware');
+const incomeController = require("../controllers/incomeController");
+
+//aytoryzacja została dodana w app.js
 
 // Endpoint do dodawania nowego przychodu
-router.post('/income', incomeController.addIncome);
+router.post("/income", incomeController.addIncome);
 
 // Endpoint do pobierania przychodów
-router.get('/income', incomeController.getIncomes);
+router.get("/income", incomeController.getIncomes);
 
 // Endpoint do usuwania przychodu
-router.delete('/income/:id', incomeController.deleteIncome); // authMiddleware.checkAuth dodać jak będzie gotowu user
+router.delete("/income/:id", incomeController.deleteIncome);
 
 // Endpoint do aktualizacji przychodu
-router.put('/income/:id', incomeController.updateIncome); // authMiddleware.checkAuth dodać jak będzie gotowu user
+// router.put('/income/:id', incomeController.updateIncome);
 
 module.exports = router;
