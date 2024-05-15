@@ -26,8 +26,10 @@ const sendAnotherToken = async (email) => {
   sendEmail(email, user.verificationToken);
 };
 
-///////////////////////////////////////////////////
+
+// OAuth 2.0  Verify google auth token, using google-auth-library / OAuth2Client
 async function verify(token) {
+  // oauth-client = oAuth2Client
   const ticket = await App.oAuth2Client.verifyIdToken({
     idToken: token,
     audience: process.env.CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
@@ -46,6 +48,7 @@ async function verify(token) {
   };
 }
 
+// GET - api/user
 const user = async (req, res, next) => {
   let token = "";
   let tokenHeader = req.headers["authorization"];
@@ -57,7 +60,7 @@ const user = async (req, res, next) => {
   if (token) {
     const user = await verify(token);
     if (user) {
-      console.log("user: ", user);
+      // console.log("user: ", user);
     res.status(200).json({
       "user": user,
     });

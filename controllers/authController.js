@@ -149,7 +149,7 @@ const google = async (req, res, next) => {
   try {
     // require("dotenv").config();
     const { tokens } = await App.oAuth2Client.getToken(req.body.code); // exchange code for tokens
-    console.log(tokens);
+    // console.log(tokens);
 
     res.json(tokens);
   } catch (e) {

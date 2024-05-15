@@ -17,19 +17,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
+// Create an OAuth client. This is required to obtain an authorization code,
+// which, in turn, will be exchanged for the access token
 const oAuth2Client = new OAuth2Client(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET,
   "postmessage",
 );
 
-
-
 app.use("/api/auth", authRouter);
 app.use("/api/user", usersRouter);
 app.use("/api/transactions", transactionsRouter);
 // dodatkowo przed routerem można dodać middleware autoryzujący użytkownika
-
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
