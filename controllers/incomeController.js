@@ -1,6 +1,6 @@
 const Income = require('../models/Income');
 const incomeSchema = require('../models/incomeJoi');
-const { checkAuth } = require('../middleware/authMiddleware');
+
 
 
 // Funkcja dodawania przychodów
@@ -136,6 +136,4 @@ module.exports = {
   addIncome,
   getIncomes,
   deleteIncome,
-    //   updateIncome
-  checkAuth
 };
