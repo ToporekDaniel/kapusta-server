@@ -114,18 +114,15 @@ const verifyRefreshToken = async (req, res, next) => {
   try {
     const refreshToken = req.body.refreshToken;
 
-    // Check if refresh token exists
     const user = await User.findOne({ refreshToken });
     if (!user) {
       return res.status(403).json({ error: 'Invalid refresh token' });
     }
 
-    // Verify refresh token expiration
     if (user.refreshTokenExpires < Date.now()) {
       return res.status(403).json({ error: 'Refresh token has expired' });
     }
 
-    // If refresh token is valid, attach it to the request for later use
     req.refreshToken = refreshToken;
     next();
   } catch (error) {
@@ -137,20 +134,18 @@ const verifyRefreshToken = async (req, res, next) => {
 const refresh = async (req, res, next) => {
   try {
     
-    const sid = req.body.sid; // Corrected to req.body.sid
+    const sid = req.body.sid;
 
-    // Check if refresh token and SID exist
     if (!sid) {
       return res.status(400).json({ error: 'SID are required' });
     }
 
     const newSid = generateSessionId();
-    // Generate new access token
+    
     const accessToken = jwt.sign({ id: req.userId }, process.env.JWT_ACCESS_SECRET, {
       expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME,
     });
 
-    // Send the new access token in the response
     res.status(200).json({ accessToken, sid: newSid });
   } catch (error) {
     console.error('Error generating access token:', error);
