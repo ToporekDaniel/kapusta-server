@@ -1,20 +1,19 @@
-const checkAuth = (req, res, next) => {
-  // Miejsce na  logikę sprawdzającą poprawność tokenu JWT 
-  // poprawność sprawdzana w nagłówku Authorization
+const passport = require("passport");
 
-  const token = req.headers.authorization;
+const authMid = async (req, res, next) => {
+  await passport.authenticate("jwt", { session: false }, async (err, user) => {
+    if (!user || err) {
+      return res.status(401).json({
+        status: "fail",
+        message: "Unauthorized",
+      });
+    }
 
-  if (!token) {
-    // Jeśli brak tokenu - zwróć błąd "Unauthorized"
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
-
-  // Miejsce na przeprowadzenie dalszej weryfikacji tokenu
-
-  // Jeśli autoryzacja jest pomyślna, przechodzimy do kolejnego middleware.... 
-  next();
+    req.user = user;
+    next();
+  })(req, res, next);
 };
 
-module.exports = {
-  checkAuth
-};
+module.exports = authMid;
+
+// checkAuth, stara wersja
