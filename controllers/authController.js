@@ -3,6 +3,7 @@ const passport = require('../config/passport.js');
 
 const User = require('../models/user.js');
 const jwt = require('jsonwebtoken');
+const { message } = require('../models/incomeJoi.js');
 
 const signToken = payload =>
   jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
@@ -13,6 +14,10 @@ const generateRefreshToken = userId => {
     return jwt.sign({ id: userId }, process.env.JWT_REFRESH_SECRET, { 
     expiresIn: process.env.JWT_REFRESH_EXPIRE_TIME,
   });
+};
+
+function generateSessionId() {
+  return uuidv4();
 };
 
 const auth = async (req, res, next) => {
@@ -76,13 +81,14 @@ const register = async (req, res, next) => {
         });
         const refreshToken = generateRefreshToken(user.id);
 
-        res.cookie("refreshToken", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
-  
+        const sid = generateSessionId();
+ 
       res.status(200).json({
         status: 'success',
         data: { email: user.email },
         accessToken,
         refreshToken,
+        sid,
       });
     } catch (err) {
       res.status(400).json({ status: 'fail', message: err.message });
@@ -95,8 +101,7 @@ const register = async (req, res, next) => {
       
       if (!user) {
           return res.status(401).json({ message: `Not authorized` });
-      }
-      res.clearCookie("refreshToken");
+      }      
       return res.status(204).json();
   } catch (error) {
       console.error("Error during logout: ", error);
@@ -104,45 +109,54 @@ const register = async (req, res, next) => {
   }
   };
 
-  const refresh = async (req, res, next) => {
-    try {
-        const refreshToken = req.cookies.refreshToken;
 
-        if (!refreshToken) {
-            return res.status(401).json({ message: "Refresh token not provided" });
-        }
+const verifyRefreshToken = async (req, res, next) => {
+  try {
+    const refreshToken = req.body.refreshToken;
 
-        const splitToken = refreshToken.split(" ")[1];
+    // Check if refresh token exists
+    const user = await User.findOne({ refreshToken });
+    if (!user) {
+      return res.status(403).json({ error: 'Invalid refresh token' });
+    }
 
-        jwt.verify(splitToken, process.env.JWT_REFRESH_SECRET, async (err, decodedToken) => {
-            if (err) {
-                return res.status(403).json({ message: "Invalid refresh token" });
-            }
+    // Verify refresh token expiration
+    if (user.refreshTokenExpires < Date.now()) {
+      return res.status(403).json({ error: 'Refresh token has expired' });
+    }
 
-            const user = await User.findOne({ _id: decodedToken.id });
-
-            if (!user) {
-                return res.status(401).json({ message: "No such user" });
-            }
-
-            const payload = {
-                id: user._id,
-                username: user.email,
-            };
-
-            const newAccessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
-                expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME,
-            });
-
-            res.status(200).json({ accessToken: newAccessToken });
-        });
-    } catch (err) {
-        console.error("Error during token refresh: ", err);
-        res.status(500).json({ error: true, message: "Internal Server Error" });
-next()
+    // If refresh token is valid, attach it to the request for later use
+    req.refreshToken = refreshToken;
+    next();
+  } catch (error) {
+    console.error('Error verifying refresh token:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-// 
+
+const refresh = async (req, res, next) => {
+  try {
+    
+    const sid = req.body.sid; // Corrected to req.body.sid
+
+    // Check if refresh token and SID exist
+    if (!sid) {
+      return res.status(400).json({ error: 'SID are required' });
+    }
+
+    const newSid = generateSessionId();
+    // Generate new access token
+    const accessToken = jwt.sign({ id: req.userId }, process.env.JWT_ACCESS_SECRET, {
+      expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME,
+    });
+
+    // Send the new access token in the response
+    res.status(200).json({ accessToken, sid: newSid });
+  } catch (error) {
+    console.error('Error generating access token:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 
   module.exports = {
     register,
@@ -150,4 +164,5 @@ next()
     logout,
     auth,
     refresh,
+    verifyRefreshToken
   };
