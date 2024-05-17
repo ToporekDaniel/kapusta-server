@@ -10,6 +10,6 @@ router.post("/login", authController.login);
 
 router.post("/logout", authMid, authController.logout);
 
-// router.post('/refresh', authController.auth, authController.refresh);
+router.post('/refresh', authController.verifyRefreshToken, authController.refresh);
 
 module.exports = router;
