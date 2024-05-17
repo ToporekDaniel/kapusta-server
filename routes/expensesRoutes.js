@@ -10,4 +10,7 @@ router.post('/', expenseController.addExpense);
 // Endpoint do pobierania wydatków
 router.get('/', expenseController.getExpenses);
 
+// Endpoint do usuwania wydatków
+router.delete('/:id', expenseController.deleteExpense);
+
 module.exports = router;

@@ -80,7 +80,34 @@ const getExpenses = async (req, res) => {
   }
 };
 
+// Funkcja usuwania wydatków
+const deleteExpense = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    if (!id) {
+      return res.status(400).json({ message: 'Invalid ID' });
+    }
+
+    const deletedExpense = await Expense.findOneAndDelete({ _id: id, userId });
+
+    if (!deletedExpense) {
+      return res.status(404).json({ message: 'Expense not found' });
+    }
+
+    // Miejsce na logikę aktualizacji salda użytkownika itp.
+    const newBalance = 0; 
+
+    res.status(200).json({ newBalance });
+  } catch (error) {
+    console.error('Error deleting expense:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 module.exports = {
   addExpense,
-  getExpenses
+  getExpenses,
+  deleteExpense
 };
