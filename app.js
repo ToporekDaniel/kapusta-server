@@ -3,6 +3,7 @@ const cors = require("cors");
 const passport = require("./config/passport");
 
 const transactionsRouter = require("./routes/incomeRoutes");
+const expensesRouter = require("./routes/expensesRoutes")
 const authRouter = require("./routes/authRouter");
 const authMid = require("./middleware/authMiddleware");
 const usersRouter = require("./routes/usersRouter");
@@ -19,6 +20,7 @@ app.use(passport.initialize());
 
 app.use("/api/auth", authRouter);
 app.use("/api/transactions", authMid, transactionsRouter);
+app.use("/api/expenses", authMid, expensesRouter);
 app.use("/api/user", authMid, usersRouter);
 // dodatkowo przed routerem można dodać middleware autoryzujący użytkownika
 
