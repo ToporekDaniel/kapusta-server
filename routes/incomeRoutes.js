@@ -5,13 +5,13 @@ const incomeController = require("../controllers/incomeController");
 //aytoryzacja została dodana w app.js
 
 // Endpoint do dodawania nowego przychodu
-router.post("/income", incomeController.addIncome);
+router.post('/', incomeController.addIncome);
 
 // Endpoint do pobierania przychodów
-router.get("/income", incomeController.getIncomes);
+router.get('/', incomeController.getIncomes);
 
 // Endpoint do usuwania przychodu
-router.delete("/income/:id", incomeController.deleteIncome);
+router.delete('/:id', incomeController.deleteIncome);
 
 // Endpoint do aktualizacji przychodu
 // router.put('/income/:id', incomeController.updateIncome);

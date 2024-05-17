@@ -5,6 +5,9 @@ const expenseController = require('../controllers/expenseController');
 
 
 // Endpoint do dodawania nowego wydatku
-router.post('/expense', expenseController.addExpense);
+router.post('/', expenseController.addExpense);
+
+// Endpoint do pobierania wydatków
+router.get('/', expenseController.getExpenses);
 
 module.exports = router;
