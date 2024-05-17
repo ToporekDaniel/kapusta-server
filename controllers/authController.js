@@ -16,9 +16,30 @@ const generateRefreshToken = (userId) => {
   });
 };
 
-function generateSessionId() {
-  return uuidv4();
-}
+const generateSessionId = (userId) => {
+  // Parsowanie czasu wygaśnięcia refresh tokena z pliku .env
+  const refreshExpireTimeInSeconds = parseInt(
+    process.env.JWT_REFRESH_EXPIRE_TIME
+  );
+  if (isNaN(refreshExpireTimeInSeconds)) {
+    throw new Error("Invalid time value");
+  }
+
+  // Obliczenie czasu wygaśnięcia SID na podstawie czasu wygaśnięcia refresh tokena
+  const expiresInMs = refreshExpireTimeInSeconds * 1000; // Czas w sekundach, więc mnożymy przez 1000, aby uzyskać milisekundy
+  const expirationTime = new Date(Date.now() + expiresInMs);
+
+  // SID zawiera identyfikator użytkownika i czas wygaśnięcia w formie obiektu JSON
+  const sid = {
+    userId: userId,
+    expiresAt: expirationTime.toISOString(), // Konwersja na ISO format
+  };
+
+  // Zakodowanie danych SID do postaci ciągu znaków
+  const encodedSid = Buffer.from(JSON.stringify(sid)).toString("base64");
+
+  return encodedSid;
+};
 
 const register = async (req, res, next) => {
   try {
@@ -69,8 +90,9 @@ const login = async (req, res, next) => {
       username: email,
     });
     const refreshToken = generateRefreshToken(user.id);
-
-    const sid = generateSessionId();
+    user.refreshToken = refreshToken;
+    await user.save();
+    const sid = generateSessionId(user.id);
 
     res.status(200).json({
       status: "success",
@@ -131,10 +153,15 @@ const refresh = async (req, res, next) => {
       return res.status(400).json({ error: "SID are required" });
     }
 
-    const newSid = generateSessionId();
+    const decodedSid = JSON.parse(Buffer.from(sid, "base64").toString("utf-8"));
+
+    // Extract user id from decoded SID
+    const userId = decodedSid.userId;
+
+    const newSid = generateSessionId(userId);
     // Generate new access token
     const accessToken = jwt.sign(
-      { id: req.userId },
+      { id: userId },
       process.env.JWT_ACCESS_SECRET,
       {
         expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME,
