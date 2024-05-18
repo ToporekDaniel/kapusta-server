@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const passport = require("../config/passport.js");
-const userValidateSchema = require("../models/userValidation.js")
+const userValidateSchema = require("../models/userValidation.js");
 const User = require("../models/user.js");
 const jwt = require("jsonwebtoken");
 const { message } = require("../models/incomeJoi.js");
@@ -44,7 +44,7 @@ const generateSessionId = (userId) => {
 const register = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const { error } = userValidateSchema.validate(body);
+    const { error } = userValidateSchema.validate(req.body);
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -55,9 +55,7 @@ const register = async (req, res, next) => {
 
     if (error) {
       const validatingErrorMessage = error.details[0].message;
-      return res
-        .status(400)
-        .json({ message: `${validatingErrorMessage}` });
+      return res.status(400).json({ message: `${validatingErrorMessage}` });
     }
 
     const user = await User.create({
@@ -78,14 +76,12 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const { error } = userValidateSchema.validate(body);
+    const { error } = userValidateSchema.validate(req.body);
 
-      if (error) {
-        const validatingErrorMessage = error.details[0].message;
-        return res
-          .status(400)
-          .json({ message: `${validatingErrorMessage}` });
-      }
+    if (error) {
+      const validatingErrorMessage = error.details[0].message;
+      return res.status(400).json({ message: `${validatingErrorMessage}` });
+    }
 
     const user = await User.findOne({
       email,
