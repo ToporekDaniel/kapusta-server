@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const passport = require("../config/passport.js");
-
+const userValidateSchema = require("../models/userValidation.js")
 const User = require("../models/user.js");
 const jwt = require("jsonwebtoken");
 const { message } = require("../models/incomeJoi.js");
@@ -44,12 +44,22 @@ const generateSessionId = (userId) => {
 const register = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const { error } = userValidateSchema.validate(body);
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
       return res
         .status(409)
         .json({ status: "fail", message: "Email already in use" });
     }
+
+    if (error) {
+      const validatingErrorMessage = error.details[0].message;
+      return res
+        .status(400)
+        .json({ message: `${validatingErrorMessage}` });
+    }
+
     const user = await User.create({
       email,
       password,
@@ -68,12 +78,14 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const { error } = userValidateSchema.validate(body);
 
-    if (!email || !password)
-      return res.status(400).json({
-        status: "fail",
-        message: "Please provide an email or password",
-      });
+      if (error) {
+        const validatingErrorMessage = error.details[0].message;
+        return res
+          .status(400)
+          .json({ message: `${validatingErrorMessage}` });
+      }
 
     const user = await User.findOne({
       email,
