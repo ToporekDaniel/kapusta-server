@@ -19,3 +19,6 @@ mongoose - biblioteka do obsługi MongoDB w Node.js
 passport - middleware do uwierzytelniania użytkownika
 passport-jwt - plugin do uwierzytelniania użytkownika za pomocą tokenów JWT
 uuid - generowanie identyfikatorów UUID cz6yli unikalnych wieloznakowych identyfikatorów
+
+# Adres serwera
+https://kapusta-server.onrender.com
