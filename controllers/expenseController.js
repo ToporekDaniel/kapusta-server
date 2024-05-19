@@ -36,10 +36,10 @@ const addExpense = async (req, res) => {
 // Funkcja pobierania wydatków
 const getExpenses = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const owner = req.user._id;
     const { date, category } = req.query;
 
-    const query = { userId };
+    const query = { owner };
     if (date) {
       query.date = date;
     }
