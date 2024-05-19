@@ -84,13 +84,13 @@ const getExpenses = async (req, res) => {
 const deleteExpense = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user._id;
+    const owner = req.user._id;
 
     if (!id) {
       return res.status(400).json({ message: 'Invalid ID' });
     }
 
-    const deletedExpense = await Expense.findOneAndDelete({ _id: id, userId });
+    const deletedExpense = await Expense.findOneAndDelete({ _id: id, owner });
 
     if (!deletedExpense) {
       return res.status(404).json({ message: 'Expense not found' });
