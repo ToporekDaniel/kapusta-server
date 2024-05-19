@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const incomeSchema = new mongoose.Schema({
-   userId: {
+  owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', 
+    ref: 'User',
     required: true
   },
   description: {
@@ -35,3 +35,4 @@ const incomeSchema = new mongoose.Schema({
 const Income = mongoose.model('Income', incomeSchema);
 
 module.exports = Income;
+
