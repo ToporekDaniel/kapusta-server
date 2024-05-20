@@ -12,7 +12,7 @@ const usersRouter = require("./routes/usersRouter");
 const app = express();
 
 app.use(cors());
-// app.use(cors({ origin: "tutaj będzie adres naszego frontu" }));
+// app.use(cors({ origin: "https://kapusta-app-madam-pab.netlify.app/" }));
 // dzięki temu tylko nasz front będzie mógł korzystać z naszego API
 
 app.use(express.json());
