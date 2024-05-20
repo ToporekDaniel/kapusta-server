@@ -1,22 +1,29 @@
 const Balance = require('../models/Balance');
 
 // Aktualizacja bilansu
-const updateBalance = async (req, res) => {
+const updateBalance = async (req, res, next) => {
   try {
-    const { value } = req.body;
-    const owner = req.user._id;
+    const { amount } = req.body; 
+    const owner = req.user._id; 
+
+    if (typeof amount !== 'number') {
+      return res.status(400).json({ message: 'Invalid amount' });
+    }
 
     let balance = await Balance.findOne({ owner });
 
     if (!balance) {
-      balance = new Balance({ owner, value });
+      // Stwórz nowy balance jeśli nie istnieje
+      balance = new Balance({ owner, value: amount });
     } else {
-      balance.value = value;
+      // Aktualizja istniejącego balance
+      balance.value += amount;
     }
 
-    await balance.save();
+    await balance.save(); 
 
-    res.status(200).json({ message: 'Balance updated successfully', balance });
+    req.balance = balance; 
+    next(); 
   } catch (error) {
     console.error('Error updating balance:', error);
     res.status(500).json({ message: 'Internal server error' });
