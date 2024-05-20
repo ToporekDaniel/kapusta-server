@@ -8,7 +8,7 @@ const getSummary = async (req, res) => {
 
     // Miejsce na logikę do generowania podsumowania w zależności od okresu
 
-    // Przykładowe podsumowanie (demo)
+    // Przykładowe podsumowanie (demo) //
     const summary = {
       monthlyExpenses: 500,
       monthlyIncome: 1500,
