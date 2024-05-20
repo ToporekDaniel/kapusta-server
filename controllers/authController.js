@@ -121,6 +121,8 @@ const logout = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: `Not authorized` });
     }
+    user.refreshToken = null;
+    await user.save();
     return res.status(204).json();
   } catch (error) {
     console.error("Error during logout: ", error);
