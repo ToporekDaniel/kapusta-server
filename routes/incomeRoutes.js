@@ -16,6 +16,8 @@ router.delete("/income/:id", incomeController.deleteIncome);
 
 // Endpoint do aktualizacji przychodu
 // router.put('/income/:id', incomeController.updateIncome);
+//
+//
 
 
 module.exports = router;
