@@ -41,9 +41,15 @@ const getExpenses = async (req, res) => {
     const { date, category } = req.query;
 
     const query = { owner };
+
     if (date) {
-      query.date = date;
+      const [year, month] = date.split("-");
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0, 23, 59, 59, 999); // Ostatni dzień miesiąca
+
+      query.date = { $gte: startDate, $lte: endDate };
     }
+
     if (category) {
       query.category = category;
     }
