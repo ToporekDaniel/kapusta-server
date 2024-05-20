@@ -22,11 +22,11 @@ const addIncome = async (req, res) => {
     ];
       const monthName = monthNames[incomeMonth];
       
-      const userId = req.user._id;
+      const owner = req.user._id;
 
     // Tworzenie nowego przychodu z dodanym miesiącem
       const newIncome = new Income({
-      userId: userId,
+      owner,
       description,
       amount,
       date,
@@ -50,9 +50,9 @@ const addIncome = async (req, res) => {
 // Funkcja pobierania przychodów
 const getIncomes = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const owner = req.user._id;
 
-    const incomes = await Income.find({ userId: userId });
+    const incomes = await Income.find({ owner });
 
     const monthStats = {
       "January": 5,
@@ -89,9 +89,9 @@ const deleteIncome = async (req, res) => {
       return res.status(400).json({ message: 'Invalid ID' });
     }
 
-    const userId = req.user._id;
+    const owner = req.user._id;
 
-    const deletedIncome = await Income.findOneAndDelete({ _id: id, userId: userId });
+    const deletedIncome = await Income.findOneAndDelete({ _id: id, owner });
 
     if (!deletedIncome) {
       return res.status(404).json({ message: 'Income not found' });
