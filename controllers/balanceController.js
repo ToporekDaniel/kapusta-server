@@ -13,7 +13,7 @@ const updateBalance = async (req, res, next) => {
     let balance = await Balance.findOne({ owner });
 
     if (!balance) {
-      // Stwórz nowy balance jeśli nie istnieje
+      //Jeśli balance nie istnieje, stwówz nowy balance
       balance = new Balance({ owner, value: amount });
     } else {
       // Aktualizja istniejącego balance
