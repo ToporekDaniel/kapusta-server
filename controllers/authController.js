@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
-
+const passport = require("../config/passport.js");
+const userValidateSchema = require("../models/userValidation.js");
 const User = require("../models/user.js");
 const jwt = require("jsonwebtoken");
 const { message } = require("../models/incomeJoi.js");
@@ -15,33 +16,48 @@ const generateRefreshToken = (userId) => {
   });
 };
 
-function generateSessionId() {
-  return uuidv4();
-}
+const generateSessionId = (userId) => {
+  // Parsowanie czasu wygaśnięcia refresh tokena z pliku .env
+  const refreshExpireTimeInSeconds = parseInt(
+    process.env.JWT_REFRESH_EXPIRE_TIME
+  );
+  if (isNaN(refreshExpireTimeInSeconds)) {
+    throw new Error("Invalid time value");
+  }
 
-const auth = async (req, res, next) => {
-  await passport.authenticate("jwt", { session: false }, async (err, user) => {
-    if (!user || err) {
-      return res.status(401).json({
-        status: "fail",
-        message: "Unauthorized",
-      });
-    }
+  // Obliczenie czasu wygaśnięcia SID na podstawie czasu wygaśnięcia refresh tokena
+  const expiresInMs = refreshExpireTimeInSeconds * 1000; // Czas w sekundach, więc mnożymy przez 1000, aby uzyskać milisekundy
+  const expirationTime = new Date(Date.now() + expiresInMs);
 
-    req.user = user;
-    next();
-  })(req, res, next);
+  // SID zawiera identyfikator użytkownika i czas wygaśnięcia w formie obiektu JSON
+  const sid = {
+    userId: userId,
+    expiresAt: expirationTime.toISOString(), // Konwersja na ISO format
+  };
+
+  // Zakodowanie danych SID do postaci ciągu znaków
+  const encodedSid = Buffer.from(JSON.stringify(sid)).toString("base64");
+
+  return encodedSid;
 };
 
 const register = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const { error } = userValidateSchema.validate(req.body);
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
       return res
         .status(409)
         .json({ status: "fail", message: "Email already in use" });
     }
+
+    if (error) {
+      const validatingErrorMessage = error.details[0].message;
+      return res.status(400).json({ message: `${validatingErrorMessage}` });
+    }
+
     const user = await User.create({
       email,
       password,
@@ -60,12 +76,12 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const { error } = userValidateSchema.validate(req.body);
 
-    if (!email || !password)
-      return res.status(400).json({
-        status: "fail",
-        message: "Please provide an email or password",
-      });
+    if (error) {
+      const validatingErrorMessage = error.details[0].message;
+      return res.status(400).json({ message: `${validatingErrorMessage}` });
+    }
 
     const user = await User.findOne({
       email,
@@ -82,8 +98,9 @@ const login = async (req, res, next) => {
       username: email,
     });
     const refreshToken = generateRefreshToken(user.id);
-
-    const sid = generateSessionId();
+    user.refreshToken = refreshToken;
+    await user.save();
+    const sid = generateSessionId(user.id);
 
     res.status(200).json({
       status: "success",
@@ -115,15 +132,18 @@ const verifyRefreshToken = async (req, res, next) => {
   try {
     const refreshToken = req.body.refreshToken;
 
+    // Check if refresh token exists
     const user = await User.findOne({ refreshToken });
     if (!user) {
       return res.status(403).json({ error: "Invalid refresh token" });
     }
 
+    // Verify refresh token expiration
     if (user.refreshTokenExpires < Date.now()) {
       return res.status(403).json({ error: "Refresh token has expired" });
     }
 
+    // If refresh token is valid, attach it to the request for later use
     req.refreshToken = refreshToken;
     next();
   } catch (error) {
@@ -134,22 +154,29 @@ const verifyRefreshToken = async (req, res, next) => {
 
 const refresh = async (req, res, next) => {
   try {
-    const sid = req.body.sid;
+    const sid = req.body.sid; // Corrected to req.body.sid
 
+    // Check if refresh token and SID exist
     if (!sid) {
       return res.status(400).json({ error: "SID are required" });
     }
 
-    const newSid = generateSessionId();
+    const decodedSid = JSON.parse(Buffer.from(sid, "base64").toString("utf-8"));
 
+    // Extract user id from decoded SID
+    const userId = decodedSid.userId;
+
+    const newSid = generateSessionId(userId);
+    // Generate new access token
     const accessToken = jwt.sign(
-      { id: req.userId },
+      { id: userId },
       process.env.JWT_ACCESS_SECRET,
       {
         expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME,
       }
     );
 
+    // Send the new access token in the response
     res.status(200).json({ accessToken, sid: newSid });
   } catch (error) {
     console.error("Error generating access token:", error);
@@ -161,7 +188,6 @@ module.exports = {
   register,
   login,
   logout,
-  auth,
   refresh,
   verifyRefreshToken,
 };

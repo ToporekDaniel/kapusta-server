@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const incomeController = require("../controllers/incomeController");
 
 //aytoryzacja została dodana w app.js
@@ -15,5 +16,6 @@ router.delete('/:id', incomeController.deleteIncome);
 
 // Endpoint do aktualizacji przychodu
 // router.put('/income/:id', incomeController.updateIncome);
+
 
 module.exports = router;
