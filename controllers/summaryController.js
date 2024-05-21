@@ -43,7 +43,7 @@ const getSummary = async (req, res) => {
     // Obliczanie sum dla Income i Expenses
     const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0);
     const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-    const balance = totalIncome - totalExpenses;
+    const balance = totalIncome + totalExpenses;
 
     // Grupy wydatków według kategorii
     const expenseSummaryByCategory = expenses.reduce((summary, expense) => {
