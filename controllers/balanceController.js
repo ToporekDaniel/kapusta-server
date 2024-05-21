@@ -1,6 +1,6 @@
 const User = require('../models/user'); // Używamy poprawnej nazwy zmiennej
 
-// Middleware do aktualizacji balansu użytkownika
+// Middleware dla aktualizacji balansu użytkownika
 const updateBalance = async (req, res, next) => {
   try {
     const user = req.user; 
