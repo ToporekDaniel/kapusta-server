@@ -1,7 +1,5 @@
-const Income = require('../models/Income');
-const incomeSchema = require('../models/incomeJoi');
-
-
+const Income = require("../models/Income");
+const incomeSchema = require("../models/incomeJoi");
 
 // Funkcja dodawania przychodów
 const addIncome = async (req, res) => {
@@ -12,25 +10,36 @@ const addIncome = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    const { description, amount, date } = req.body;
+    const { description, amount, date, category } = req.body;
 
     const incomeMonth = new Date(date).getMonth();
 
     const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
-      const monthName = monthNames[incomeMonth];
-      
-      const owner = req.user._id;
+    const monthName = monthNames[incomeMonth];
+
+    const owner = req.user._id;
 
     // Tworzenie nowego przychodu z dodanym miesiącem
-      const newIncome = new Income({
+    const newIncome = new Income({
       owner,
       description,
       amount,
+      category,
       date,
-      month: monthName
+      month: monthName,
     });
 
     await newIncome.save();
@@ -39,11 +48,11 @@ const addIncome = async (req, res) => {
 
     res.status(200).json({
       newBalance: newBalance,
-      transaction: newIncome
+      transaction: newIncome,
     });
   } catch (error) {
-    console.error('Error adding income:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error adding income:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -55,34 +64,36 @@ const getIncomes = async (req, res) => {
     const incomes = await Income.find({ owner });
 
     const monthStats = {
-      "January": 0,
-      "February": 0,
-      "March": 0,
-      "April": 0,
-      "May": 0,
-      "June": 0,
-      "July": 0,
-      "August": 0,
-      "September": 0,
-      "October": 0,
-      "November": 0,
-      "December": 0
+      January: 0,
+      February: 0,
+      March: 0,
+      April: 0,
+      May: 0,
+      June: 0,
+      July: 0,
+      August: 0,
+      September: 0,
+      October: 0,
+      November: 0,
+      December: 0,
     };
 
     // Obliczanie sumy dla każdego miesiąca
-    incomes.forEach(income => {
-      const month = new Date(income.date).toLocaleString('default', { month: 'long' });
+    incomes.forEach((income) => {
+      const month = new Date(income.date).toLocaleString("default", {
+        month: "long",
+      });
       monthStats[month] += income.amount;
     });
 
     res.status(200).json({
       incomes,
-      monthStats
+      monthStats,
     });
   } catch (error) {
     // Obsługa błędów
-    console.error('Error getting incomes:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error("Error getting incomes:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -92,7 +103,7 @@ const deleteIncome = async (req, res) => {
     const { id } = req.params;
 
     if (!id) {
-      return res.status(400).json({ message: 'Invalid ID' });
+      return res.status(400).json({ message: "Invalid ID" });
     }
 
     const owner = req.user._id;
@@ -100,7 +111,7 @@ const deleteIncome = async (req, res) => {
     const deletedIncome = await Income.findOneAndDelete({ _id: id, owner });
 
     if (!deletedIncome) {
-      return res.status(404).json({ message: 'Income not found' });
+      return res.status(404).json({ message: "Income not found" });
     }
 
     // Symulacja aktualizacji salda
@@ -109,8 +120,8 @@ const deleteIncome = async (req, res) => {
     res.status(200).json({ newBalance });
   } catch (error) {
     // Obsługa błędów
-    console.error('Error deleting income:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error("Error deleting income:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -136,7 +147,6 @@ const deleteIncome = async (req, res) => {
 //     res.status(500).json({ message: 'Internal Server Error' });
 //   }
 // };
-
 
 module.exports = {
   addIncome,

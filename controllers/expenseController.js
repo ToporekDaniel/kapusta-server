@@ -1,5 +1,6 @@
 const Expense = require("../models/Expense");
 const expensesSchema = require("../models/expensesJoi"); // Importuj schemat walidacji
+const { user } = require("./userController");
 
 // Funkcja dodawania wydatków
 const addExpense = async (req, res) => {
@@ -105,8 +106,8 @@ const deleteExpense = async (req, res) => {
       return res.status(404).json({ message: "Expense not found" });
     }
 
-    // Miejsce na logikę aktualizacji salda użytkownika itp.
-    const newBalance = 0;
+    // Miejsce na logikę aktualizacji salda użytkownika itp. nie wiem czy
+    const newBalance = user.balance;
 
     res.status(200).json({ newBalance });
   } catch (error) {

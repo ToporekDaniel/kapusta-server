@@ -1,38 +1,41 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const incomeSchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: "User",
+    required: true,
   },
   description: {
     type: String,
     required: true,
     minlength: 1,
-    maxlength: 300
+    maxlength: 300,
   },
   amount: {
     type: Number,
     required: true,
     min: 1,
-    max: 1000000000
+    max: 1000000000,
   },
   date: {
     type: Date,
-    required: true
+    required: true,
+  },
+  category: {
+    type: String,
+    required: true,
   },
   month: {
     type: String,
-    required: true
+    required: true,
   },
   updatedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
-const Income = mongoose.model('Income', incomeSchema);
+const Income = mongoose.model("Income", incomeSchema);
 
 module.exports = Income;
-
