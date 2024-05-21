@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
+const App = require("./../app.js");
 const passport = require("../config/passport.js");
 const userValidateSchema = require("../models/userValidation.js");
 const User = require("../models/user.js");
@@ -19,7 +20,7 @@ const generateRefreshToken = (userId) => {
 const generateSessionId = (userId) => {
   // Parsowanie czasu wygaśnięcia refresh tokena z pliku .env
   const refreshExpireTimeInSeconds = parseInt(
-    process.env.JWT_REFRESH_EXPIRE_TIME
+    process.env.JWT_REFRESH_EXPIRE_TIME,
   );
   if (isNaN(refreshExpireTimeInSeconds)) {
     throw new Error("Invalid time value");
@@ -87,11 +88,12 @@ const login = async (req, res, next) => {
       email,
     }).select("password email verify name");
 
-    if (!user || !(await user.isCorrectPassword(password, user.password)))
+    if (!user || !(await user.isCorrectPassword(password, user.password))) {
       return res.status(400).json({
         status: "fail",
         message: "The email or password is incorrect!",
       });
+    }
 
     const accessToken = signToken({
       id: user.id,
@@ -175,7 +177,7 @@ const refresh = async (req, res, next) => {
       process.env.JWT_ACCESS_SECRET,
       {
         expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME,
-      }
+      },
     );
 
     // Send the new access token in the response
@@ -186,10 +188,48 @@ const refresh = async (req, res, next) => {
   }
 };
 
+// -AD-
+const google = async (req, res, next) => {
+  try {
+    // require("dotenv").config();
+    const { tokens } = await App.oAuth2Client.getToken(req.body.code); // exchange code for tokens
+    // console.log(tokens);
+
+    res.json(tokens);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+// -AD- OAuth 2.0  Verify google auth token, using google-auth-library / OAuth2Client
+async function verify(token) {
+  // oauth-client = oAuth2Client
+  const ticket = await App.oAuth2Client.verifyIdToken({
+    idToken: token,
+    audience: process.env.CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
+    // Or, if multiple clients access the backend:
+    //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+  });
+  const payload = ticket.getPayload();
+
+  let name = payload.name, email = payload.email, img = payload.picture;
+
+  return {
+    name,
+    email,
+    img,
+  };
+}
+
 module.exports = {
   register,
   login,
   logout,
   refresh,
   verifyRefreshToken,
+    google,
+  signToken,
+  generateRefreshToken,
+  generateSessionId,
+
 };
