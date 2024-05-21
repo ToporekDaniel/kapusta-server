@@ -1,32 +1,27 @@
-const Balance = require('../models/Balance');
+const User = require('../models/user'); // Używamy poprawnej nazwy zmiennej
 
-// Aktualizacja bilansu
+// Middleware do aktualizacji balansu użytkownika
 const updateBalance = async (req, res, next) => {
   try {
-    const { amount } = req.body; 
-    const owner = req.user._id; 
+    const user = req.user; 
+    const { amount } = req.body;
 
-    if (typeof amount !== 'number') {
-      return res.status(400).json({ message: 'Invalid amount' });
+    if (!user) {
+      return res.status(401).json({ message: "Not authorized" });
     }
 
-    let balance = await Balance.findOne({ owner });
-
-    if (!balance) {
-      //Jeśli balance nie istnieje, stwówz nowy balance
-      balance = new Balance({ owner, value: amount });
-    } else {
-      // Aktualizja istniejącego balance
-      balance.value += amount;
+    if (typeof amount !== "number") {
+      return res.status(400).json({ message: "Invalid amount" });
     }
 
-    await balance.save(); 
+    user.balance += amount;
+    await user.save();
 
-    req.balance = balance; 
-    next(); 
+    req.balance = user.balance; 
+    next();
   } catch (error) {
-    console.error('Error updating balance:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error updating balance:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
