@@ -25,17 +25,19 @@ const updateBalance = async (req, res, next) => {
   }
 };
 
-// Odczyt bilansu
-const getBalance = async (req, res) => {
+// Middleware dla odczytu bilansu użytkownika
+const getBalance = async (req, res, next) => {
   try {
-    const owner = req.user._id;
-    const balance = await Balance.findOne({ owner });
+    const user = req.user; 
 
-    if (!balance) {
-      return res.status(404).json({ message: 'Balance not found' });
+    if (!user) {
+      return res.status(401).json({ message: "Not authorized" });
     }
 
-    res.status(200).json({ balance });
+    const balance = user.balance; 
+
+    req.balance = balance; 
+    next();
   } catch (error) {
     console.error('Error getting balance:', error);
     res.status(500).json({ message: 'Internal server error' });
