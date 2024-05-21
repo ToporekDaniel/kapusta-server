@@ -18,4 +18,5 @@ router.delete('/:id', incomeController.deleteIncome);
 // router.put('/income/:id', incomeController.updateIncome);
 
 
+
 module.exports = router;

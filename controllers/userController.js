@@ -1,5 +1,6 @@
 const User = require("../models/user");
 
+// wprowadzenie balansu początkowego
 const changeBalance = async (req, res, next) => {
   try {
     const user = req.user;

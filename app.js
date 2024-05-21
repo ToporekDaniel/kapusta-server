@@ -8,6 +8,8 @@ const categoryRouter = require("./routes/categoryRoutes");
 const authRouter = require("./routes/authRouter");
 const authMid = require("./middleware/authMiddleware");
 const usersRouter = require("./routes/usersRouter");
+const balanceRouter = require('./routes/balanceRouter');
+const summaryRouter = require('./routes/summaryRouter');
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.use("/api/transaction/income", authMid, incomeRouter); // Zmiana ścieżki
 app.use("/api/transaction/expense", authMid, expenseRouter); // Zmiana ścieżki
 app.use("/api/transaction", authMid, categoryRouter); 
 app.use("/api/user", authMid, usersRouter);
+app.use('/api/balance', authMid, balanceRouter);
+app.use('/api/summary', authMid, summaryRouter);
 // dodatkowo przed routerem można dodać middleware autoryzujący użytkownika
 
 app.use((req, res) => {
