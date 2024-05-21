@@ -8,17 +8,10 @@ const categoryRouter = require("./routes/categoryRoutes");
 const authRouter = require("./routes/authRouter");
 const authMid = require("./middleware/authMiddleware");
 const usersRouter = require("./routes/usersRouter");
-const balanceRouter = require('./routes/balanceRouter');
-const summaryRouter = require('./routes/summaryRouter');
+const balanceRouter = require("./routes/balanceRouter");
+const summaryRouter = require("./routes/summaryRouter");
 
-
-
-
-
-
-const {
-  OAuth2Client,
-} = require("google-auth-library");
+const { OAuth2Client } = require("google-auth-library");
 
 const app = express();
 
@@ -35,16 +28,17 @@ app.use(passport.initialize());
 const oAuth2Client = new OAuth2Client(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET,
-  "postmessage",
+  "postmessage"
 );
-
 
 app.use("/api/auth", authRouter);
 app.use("/api/transaction/income", authMid, incomeRouter); // Zmiana ścieżki
 app.use("/api/transaction/expense", authMid, expenseRouter); // Zmiana ścieżki
-app.use("/api/transaction", authMid, categoryRouter); 
+app.use("/api/transaction", authMid, categoryRouter);
 app.use("^/api/user/$", usersRouter); // tylko /api/user  bez authMid
-app.use("/api/user/*",authMid, usersRouter);
+app.use("/api/user/*", authMid, usersRouter);
+app.use("/api/balance", authMid, balanceRouter);
+app.use("/api/summary", authMid, summaryRouter);
 
 // dodatkowo przed routerem można dodać middleware autoryzujący użytkownika
 
