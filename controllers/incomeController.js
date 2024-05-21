@@ -55,19 +55,25 @@ const getIncomes = async (req, res) => {
     const incomes = await Income.find({ owner });
 
     const monthStats = {
-      "January": 5,
-      "February": 100,
-      "March": "N/A",
-      "April": "N/A",
-      "May": 1,
-      "June": "N/A",
-      "July": 3,
-      "August": "N/A",
-      "September": "N/A",
-      "October": 77,
-      "November": "N/A",
-      "December": 123 // Na razie ustawione sztywne wartości 
+      "January": 0,
+      "February": 0,
+      "March": 0,
+      "April": 0,
+      "May": 0,
+      "June": 0,
+      "July": 0,
+      "August": 0,
+      "September": 0,
+      "October": 0,
+      "November": 0,
+      "December": 0
     };
+
+    // Obliczanie sumy dla każdego miesiąca
+    incomes.forEach(income => {
+      const month = new Date(income.date).toLocaleString('default', { month: 'long' });
+      monthStats[month] += income.amount;
+    });
 
     res.status(200).json({
       incomes,
