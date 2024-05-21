@@ -17,6 +17,7 @@ const userSchema = new Schema({
   originUrl: {
     type: String,
   },
+  // tutaj powinniśmy dodawać i aktualizować saldo użytkownika
   balance: {
     type: Number,
     default: 0,
