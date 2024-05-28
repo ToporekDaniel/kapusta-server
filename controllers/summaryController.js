@@ -55,11 +55,22 @@ const getSummary = async (req, res) => {
       return summary;
     }, {});
 
+    // Grupy wydatków według miesięcy (w formacie długim np. January)
+    const expenseSummaryByMonth = expenses.reduce((summary, expense) => {
+      const month = expense.date.toLocaleString('default', { month: 'long' });
+      if (!summary[month]) {
+        summary[month] = 0;
+      }
+      summary[month] += expense.amount;
+      return summary;
+    }, {});
+
     const summary = {
       totalIncome,
       totalExpenses,
       balance,
-      expenseSummaryByCategory
+      expenseSummaryByCategory,
+      expenseSummaryByMonth 
     };
 
     res.status(200).json({ summary });
